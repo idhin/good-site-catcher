@@ -2,7 +2,12 @@ import tldextract
 
 def is_valid_domain(domain):
     extracted = tldextract.extract(domain)
-    return bool(extracted.domain) and bool(extracted.suffix)
+    if bool(extracted.domain) and bool(extracted.suffix):
+        # Tambahkan aturan untuk memeriksa kata kunci yang tidak diinginkan
+        unwanted_keywords = ['azure', 'cpanel', 'cloudflare', 'aws.dev', 'git', 'mongodb']
+        if not any(keyword in domain.lower() for keyword in unwanted_keywords):
+            return True
+    return False
 
 if __name__ == "__main__":
     import sys
