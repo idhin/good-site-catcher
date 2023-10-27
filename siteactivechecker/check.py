@@ -1,6 +1,6 @@
 import requests
 from colorama import Fore, Style, init
-import sys
+import threading
 
 # Inisialisasi colorama
 init()
@@ -22,13 +22,23 @@ def main(input_file):
     with open(input_file, 'r') as file:
         websites = file.read().splitlines()
 
-    with open('live.txt', 'w') as live_file:
-        for i, website in enumerate(websites, start=1):
-            result = check_website(website)
-            print(f"Progress: {i}/{len(websites)}", end='\r')
-            sys.stdout.flush()
-            print(result)
+    def check_and_write(website):
+        result = check_website(website)
+        print(result)
+        with lock:
             live_file.write(result + '\n')
+
+    with open('live.txt', 'w') as live_file:
+        lock = threading.Lock()
+        threads = []
+
+        for website in websites:
+            thread = threading.Thread(target=check_and_write, args=(website,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
 
 if __name__ == '__main__':
     input_file = input("Masukkan nama file dengan daftar website: ")
