@@ -1,0 +1,10 @@
+cpanel
+dns
+mail
+cp
+webmail
+webdisk
+cpcontacts
+cloudflare
+phpmyadmin
+sonar
