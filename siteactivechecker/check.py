@@ -1,9 +1,5 @@
 import requests
-from colorama import Fore, Style, init
 import threading
-
-# Inisialisasi colorama
-init()
 
 def check_website(url):
     if not url.startswith('https://'):
@@ -12,21 +8,24 @@ def check_website(url):
     try:
         response = requests.get(url, timeout=5)
         if response.status_code == 200:
-            return f"{Fore.GREEN}{url} - Active{Style.RESET_ALL}"
-        else:
-            return f"{Fore.RED}{url} - Inactive{Style.RESET_ALL}"
+            return url, True
     except Exception as e:
-        return f"{Fore.YELLOW}{url} - Error: {str(e)}{Style.RESET_ALL}"
+        pass
+
+    return url, False
 
 def main(input_file):
     with open(input_file, 'r') as file:
         websites = file.read().splitlines()
 
     def check_and_write(website):
-        result = check_website(website)
-        print(result)
-        with lock:
-            live_file.write(result + '\n')
+        url, active = check_website(website)
+        if active:
+            with lock:
+                live_file.write(url + '\n')
+                print(f"ℹ️ {url} - Active")
+        else:
+            print(f"⚠️ {url} - Inactive or Error")
 
     with open('live.txt', 'w') as live_file:
         lock = threading.Lock()
